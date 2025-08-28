@@ -1,4 +1,4 @@
 all_embeddings.pt
 /__pycache__
 /myenv
-*.egg-info/
+/*.egg-info/
