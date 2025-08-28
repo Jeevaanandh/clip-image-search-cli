@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gva-cli"
+version = "0.1.0"
+description = "A CLI for searching images using CLIP + FAISS"
+authors = [{ name = "Jeeva Anandh" }]
+dependencies = [
+    "click",
+    "torch",
+    "faiss-cpu",
+    "clip-anytorch",
+    "tqdm",
+    "halo",
+    "numpy",
+    "Pillow"
+]
+
+[project.scripts]
+gva = "gva_cli.cli:cli"
+
+[tool.setuptools]
+packages = ["gva_cli"]
+

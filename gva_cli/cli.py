@@ -1,5 +1,5 @@
 import click
-from Embeddings import getEmbeddings, Search, getPaths, updateFolder
+from gva_cli.embeddings import getEmbeddings, Search, getPaths, updateFolder
 
 @click.group()
 def cli():

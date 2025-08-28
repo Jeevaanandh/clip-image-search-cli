@@ -1,0 +1,8 @@
+click
+torch
+faiss-cpu
+clip-anytorch
+tqdm
+halo
+numpy
+Pillow
