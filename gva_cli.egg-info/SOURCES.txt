@@ -1,9 +1,0 @@
-pyproject.toml
-gva_cli/cli.py
-gva_cli/embeddings.py
-gva_cli.egg-info/PKG-INFO
-gva_cli.egg-info/SOURCES.txt
-gva_cli.egg-info/dependency_links.txt
-gva_cli.egg-info/entry_points.txt
-gva_cli.egg-info/requires.txt
-gva_cli.egg-info/top_level.txt

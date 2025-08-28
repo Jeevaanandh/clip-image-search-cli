@@ -1,2 +1,0 @@
-[console_scripts]
-gva = gva_cli.cli:cli
