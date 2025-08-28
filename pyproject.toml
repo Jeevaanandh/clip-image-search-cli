@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "gva-cli"
 version = "0.1.0"
 description = "A CLI for searching images using CLIP + FAISS"
-authors = [{ name = "Jeeva Anandh" }]
+authors = [{ name = "Jeevaanandh" }]
 dependencies = [
     "click",
     "torch",
