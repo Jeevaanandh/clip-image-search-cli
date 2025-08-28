@@ -1,5 +1,5 @@
 import click
-from Embeddings import getEmbeddings, Search, getPaths
+from Embeddings import getEmbeddings, Search, getPaths, updateFolder
 
 @click.group()
 def cli():
@@ -36,6 +36,16 @@ def get_paths():
 
     else:
         print("No folders embedded")
+
+
+@cli.command()
+@click.argument('image_folder', type=click.Path(exists=True))
+def update(image_folder):
+    status= updateFolder(image_folder)
+
+    if(status== "Success"):
+        print("New images saved")
+
 
 
 if __name__ == '__main__':
