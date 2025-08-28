@@ -115,4 +115,18 @@ def Search(path, prompt):
 
     return top_results
 
+
+def getPaths():
+    file_path = "all_embeddings.pt"
+    if not os.path.exists(file_path):
+        return []
+    
+    all_data = torch.load(file_path, weights_only=False)
+
+    paths=[]
+    for path in list(all_data.keys()):
+        paths.append(path)
+
+    return paths
+
     

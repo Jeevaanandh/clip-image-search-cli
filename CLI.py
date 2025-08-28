@@ -1,5 +1,5 @@
 import click
-from Embeddings import getEmbeddings, Search
+from Embeddings import getEmbeddings, Search, getPaths
 
 @click.group()
 def cli():
@@ -24,6 +24,18 @@ def search(image_folder, prompt):
 
     else:
         print("Not found. Run embed first")
+
+
+@cli.command(name="get-paths")
+def get_paths():
+    paths=getPaths()
+
+    if(paths):
+        for path in paths:
+            print(path)
+
+    else:
+        print("No folders embedded")
 
 
 if __name__ == '__main__':
