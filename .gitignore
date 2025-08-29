@@ -2,3 +2,4 @@ all_embeddings.pt
 /__pycache__
 /myenv
 /*.egg-info/
+/gva_cli/__pycache__/
