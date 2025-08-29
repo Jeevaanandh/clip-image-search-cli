@@ -52,15 +52,6 @@ def search_all(prompt):
 
 
 
-
-
-
-
-
-
-
-
-
 @cli.command(name="get-paths")
 def get_paths():
     paths=getPaths()
