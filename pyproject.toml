@@ -17,6 +17,7 @@ dependencies = [
     "numpy",
     "Pillow"
 ]
+#This enables us to run the command as gva instead of gva_cli.cli:cli
 
 [project.scripts]
 gva = "gva_cli.cli:cli"

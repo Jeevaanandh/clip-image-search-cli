@@ -1,5 +1,7 @@
 import click
 from gva_cli.embeddings import getEmbeddings, Search, getPaths, updateFolder, Search_All
+from pathlib import Path
+import subprocess
 
 @click.group()
 def cli():
@@ -50,6 +52,20 @@ def search_all(prompt):
         print("Not found. Run embed first")
 
 
+@cli.command(name="sync")
+@click.argument('path')
+def sync_folder(path):
+    base_dir= Path(__file__).resolve().parent
+    db_exe= base_dir/ "FileTraversal" / "db_exe"
+    hashPath= base_dir / "FileTraversal" / "hash.py"
+
+    subprocess.run(
+        [str(db_exe), path, hashPath],
+        check=True
+    )
+
+
+
 
 
 @cli.command(name="get-paths")
@@ -65,6 +81,9 @@ def get_paths():
 
     else:
         print("No folders embedded")
+
+
+
 
 
 @cli.command()

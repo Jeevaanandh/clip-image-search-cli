@@ -3,3 +3,8 @@ all_embeddings.pt
 /myenv
 /*.egg-info/
 /gva_cli/__pycache__/
+/gva_cli/FileTraversal/index.db
+/gva_cli/FileTraversal/db_exe
+/gva_cli/FileTraversal/main.o
+/gva_cli/FileTraversal/db.o
+/gva_cli/FileTraversal/traverse.o
