@@ -8,3 +8,6 @@ all_embeddings.pt
 /gva_cli/FileTraversal/main.o
 /gva_cli/FileTraversal/db.o
 /gva_cli/FileTraversal/traverse.o
+/gva_cli/FileTraversal/test.c
+/gva_cli/FileTraversal/test
+/gva_cli/index.db
