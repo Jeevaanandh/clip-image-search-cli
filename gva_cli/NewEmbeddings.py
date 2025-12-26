@@ -1,0 +1,147 @@
+import sqlite3
+
+import clip
+import torch
+from PIL import Image
+import faiss
+import os
+import numpy as np
+from tqdm import tqdm
+
+conn= sqlite3.connect("embeddings.db")
+cursor= conn.cursor()
+
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+def getEmbeddings(path):
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-L/14", device=device)
+
+    Image.MAX_IMAGE_PIXELS = None
+
+    image_folder = path
+    valid_exts = (".jpg", ".jpeg", ".png")
+
+    image_files = sorted([
+        f for f in os.listdir(image_folder)
+        if f.lower().endswith(valid_exts)
+    ])
+    
+    BATCH_SIZE = 16
+    embeddings = []
+    valid_files = []
+    valid_paths=[]
+
+    batch_images = []
+    batch_names = []
+    batch_paths=[]
+
+    cursor.execute("CREATE TABLE IF NOT EXISTS Embeddings(" \
+    "path TEXT PRIMARY KEY," \
+    "name TEXT," \
+    "embeddings BLOB);")
+
+    with torch.no_grad():
+        for filename in tqdm(image_files):
+            try:
+                image_path = os.path.join(image_folder, filename)
+                image = Image.open(image_path).convert("RGB")
+
+                image_input = preprocess(image)
+                batch_images.append(image_input)
+                batch_names.append(filename)
+                batch_paths.append(image_path)
+
+                if len(batch_images) == BATCH_SIZE:
+                    image_tensor = torch.stack(batch_images).to(device)
+                    batch_embeddings = model.encode_image(image_tensor).cpu().numpy()  # Move to CPU and convert to numpy
+                    embeddings.extend(batch_embeddings)
+                    valid_files.extend(batch_names)
+                    valid_paths.extend(batch_paths)
+                    batch_images, batch_names, batch_paths = [], [], []
+                    
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+                continue
+        
+        if batch_images:
+            image_tensor = torch.stack(batch_images).to(device)
+            batch_embeddings = model.encode_image(image_tensor).cpu().numpy()  # Move to CPU and convert to numpy
+            embeddings.extend(batch_embeddings)
+            valid_files.extend(batch_names)
+            valid_paths.extend(batch_paths)
+
+    # Convert to numpy array
+    embeddings = np.array(embeddings)
+
+    
+
+
+    for i in range(0, len(valid_paths)):
+        embedding_blob= embeddings[i].astype(np.float32).tobytes()
+        cursor.execute("INSERT INTO Embeddings VALUES(?,?,?)", (valid_paths[i], valid_files[i], embedding_blob))
+        
+    conn.commit()
+
+
+
+
+
+def Search(prompt):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-L/14", device=device)
+
+    
+    
+    embeddings=[]
+    cursor.execute("SELECT * FROM Embeddings;")
+    rows= cursor.fetchall()
+
+    valid_names=[]
+
+    for path, name, emb in rows:
+        embedding = np.frombuffer(emb, dtype=np.float32)
+        embeddings.append(embedding)
+        valid_names.append(name)
+
+
+    embeddings = np.vstack(embeddings).astype(np.float32)
+
+    d = embeddings.shape[1]  
+    index = faiss.IndexFlatIP(d)
+    faiss.normalize_L2(embeddings)
+    index.add(embeddings)
+
+    text = clip.tokenize([prompt]).to(device)
+    
+    with torch.no_grad():
+        text_features = model.encode_text(text)
+
+    # Move text features to CPU and convert to numpy
+    text_vector = text_features.cpu().numpy().astype('float32')
+    faiss.normalize_L2(text_vector)
+
+
+    k = 10
+    distances, indices = index.search(text_vector, k)
+
+    top_results = []
+    for idx in indices[0]:
+          # Safety check
+        top_results.append(valid_names[idx])
+
+    return top_results
+
+
+
+
+
+res= Search("Red Dead Redemption")
+
+for i in res:
+    print(i)
+
+    
+
+    

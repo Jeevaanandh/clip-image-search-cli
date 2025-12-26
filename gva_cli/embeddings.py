@@ -6,6 +6,8 @@ import os
 import numpy as np
 from tqdm import tqdm
 
+import sqlite3
+
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 def getEmbeddings(path):

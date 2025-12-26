@@ -11,3 +11,4 @@ all_embeddings.pt
 /gva_cli/FileTraversal/test.c
 /gva_cli/FileTraversal/test
 /gva_cli/index.db
+/gva_cli/embeddings.db
