@@ -9,15 +9,13 @@ def cli():
 
 
 @cli.command()
-@click.argument('image_folder', type=click.Path(exists=True))
-def embed(image_folder):
-    getEmbeddings(image_folder)
+def embed():
+    getEmbeddings()
 
 @cli.command()
-@click.argument('image_folder', type=click.Path(exists=True))
 @click.argument('prompt')
-def search(image_folder, prompt):
-    results= Search(image_folder, prompt)
+def search(prompt):
+    results= Search(prompt)
 
     print("\n")
 

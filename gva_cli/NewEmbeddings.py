@@ -15,6 +15,19 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 def getEmbeddings(path):
     
+    
+    
+    listOfTables=cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Embeddings'; ").fetchall()
+    if(listOfTables):
+        print("Embeddings for the Current Folder is already done. Use 'sync' to update ")
+        return
+
+    cursor.execute("CREATE TABLE IF NOT EXISTS Embeddings(" \
+    "path TEXT PRIMARY KEY," \
+    "name TEXT," \
+    "embeddings BLOB);")
+
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model, preprocess = clip.load("ViT-L/14", device=device)
 
@@ -36,11 +49,6 @@ def getEmbeddings(path):
     batch_images = []
     batch_names = []
     batch_paths=[]
-
-    cursor.execute("CREATE TABLE IF NOT EXISTS Embeddings(" \
-    "path TEXT PRIMARY KEY," \
-    "name TEXT," \
-    "embeddings BLOB);")
 
     with torch.no_grad():
         for filename in tqdm(image_files):
@@ -136,8 +144,10 @@ def Search(prompt):
 
 
 
-
+getEmbeddings("/Users/JeevaanandhIlayaraja/Desktop/Wallpapers")
 res= Search("Red Dead Redemption")
+
+print(os.getcwd())
 
 for i in res:
     print(i)
