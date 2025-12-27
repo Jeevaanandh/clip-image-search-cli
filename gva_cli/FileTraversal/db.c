@@ -17,21 +17,13 @@ int db_init(const char *db_path){
         return -1;
     }
 
-    sql= "CREATE TABLE IF NOT EXISTS Hash("\
-         "path TEXT PRIMARY KEY,"\
-         "hash TEXT NOT NULL);";
-
-    rc= sqlite3_exec(DB, sql, 0, 0, &err_msg);
-
-    if(rc != SQLITE_OK){
-        return -1;
-    }
+    
 
     return 0;   
 }
 
 int delete(const char *path){
-    sql= "DELETE FROM Hash WHERE path= ?";
+    sql= "DELETE FROM Embeddings WHERE path= ?";
 
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
@@ -142,7 +134,7 @@ int add(const char *path, const char *hashPath){
 int checkDiff(const char *path){
     // Add the logic
 
-    sql= "SELECT path FROM HASH WHERE path like ?;";
+    sql= "SELECT path FROM Embeddings WHERE path like ?;";
     int count=0;
 
     char pattern[PATH_MAX];
@@ -161,12 +153,12 @@ int checkDiff(const char *path){
 
     
     while(sqlite3_step(stmt)==SQLITE_ROW){
-        const char * path = (const char *) sqlite3_column_text(stmt,0);
+        const char * path1 = (const char *) sqlite3_column_text(stmt,0);
 
-        if(stat(path, &fp)!=0){
+        if(stat(path1, &fp)!=0){
             
 
-            int res= delete(path);
+            int res= delete(path1);
             if(res==0){
                 count+=1;
                 

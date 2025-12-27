@@ -199,45 +199,51 @@ def Search_All(prompt):
 
 
 
-def updateFolder(path):
+def updateFolder():
+    path= os.getcwd()
+    
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model, preprocess = clip.load("ViT-L/14", device=device)
 
     BATCH_SIZE= 16
 
-    file_path = "all_embeddings.pt"
-    if not os.path.exists(file_path):
-        return
-    
-    all_data = torch.load(file_path, weights_only=False)
-    
+    cur_files=[]
+    lst = conn.execute("SELECT name FROM Embeddings;").fetchall()
+
+    for f in lst:
+        cur_files.append(f[0])
+
 
     
-
-    if(path not in list(all_data.keys())):
-        return 
-    
-
-    cur_folder= all_data[path]
-    cur_files= cur_folder["files"]
-
     image_folder = path
-    valid_exts = (".jpg", ".jpeg", ".png")
+    valid_exts = (".jpg", ".jpeg", ".png", "webp")
 
-    image_files = sorted([
-        f for f in os.listdir(image_folder)
-        if(f.lower().endswith(valid_exts) and f not in cur_files)
-    ])
+    
+    image_files = []
+
+    for f in os.listdir():
+        if(f.lower().endswith(valid_exts) and f not in cur_files):
+            image_files.append(f)
+
+
+    
+    count= len(image_files)
+    if(count==0):
+        return 0
+    
+    
 
     embeddings=[]
     valid_files=[]
+    valid_paths=[]
 
     batch_images = []
     batch_names = []
+    batch_paths=[]
 
-
+    
     with torch.no_grad():
-        for filename in image_files:
+        for filename in tqdm(image_files):
             try:
                 image_path = os.path.join(image_folder, filename)
                 image = Image.open(image_path).convert("RGB")
@@ -245,13 +251,15 @@ def updateFolder(path):
                 image_input = preprocess(image)
                 batch_images.append(image_input)
                 batch_names.append(filename)
+                batch_paths.append(image_path)
 
                 if len(batch_images) == BATCH_SIZE:
                     image_tensor = torch.stack(batch_images).to(device)
                     batch_embeddings = model.encode_image(image_tensor).cpu().numpy()  # Move to CPU and convert to numpy
                     embeddings.extend(batch_embeddings)
                     valid_files.extend(batch_names)
-                    batch_images, batch_names = [], []
+                    valid_paths.extend(batch_paths)
+                    batch_images, batch_names, batch_paths = [], [], []
                     
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
@@ -262,19 +270,21 @@ def updateFolder(path):
             batch_embeddings = model.encode_image(image_tensor).cpu().numpy()  # Move to CPU and convert to numpy
             embeddings.extend(batch_embeddings)
             valid_files.extend(batch_names)
-    
+            valid_paths.extend(batch_paths)
 
+    # Convert to numpy array
     embeddings = np.array(embeddings)
 
-    cur_folder["files"].extend(valid_files)
-    if embeddings.size > 0:
-        cur_folder["embeddings"] = np.concatenate(
-            (cur_folder["embeddings"], embeddings), axis=0
-        )
     
-    torch.save(all_data, file_path)
 
-    return("Success")
+
+    for i in range(0, len(valid_paths)):
+        embedding_blob= embeddings[i].astype(np.float32).tobytes()
+        cursor.execute("INSERT INTO Embeddings VALUES(?,?,?)", (valid_paths[i], valid_files[i], embedding_blob))
+        
+    conn.commit()
+
+    return count
 
 
 def getPaths():

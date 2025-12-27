@@ -144,6 +144,87 @@ def Search(prompt):
 
 
 
+def updateFolder():
+    path= os.getcwd()
+    print(path)
+    return 0
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-L/14", device=device)
+
+    BATCH_SIZE= 16
+
+    cur_files = conn.execute(
+        "SELECT path FROM Embeddings WHERE path LIKE ?;",
+        (f"%{path}%",)
+    ).fetchall()
+
+    image_folder = path
+    valid_exts = (".jpg", ".jpeg", ".png")
+
+    
+    image_files = sorted([
+        f for f in os.listdir(image_folder)
+        if(f.lower().endswith(valid_exts) and f not in cur_files)
+    ])
+
+    count= len(image_files)
+
+    embeddings=[]
+    valid_files=[]
+    valid_paths=[]
+
+    batch_images = []
+    batch_names = []
+    batch_paths=[]
+
+    
+    with torch.no_grad():
+        for filename in tqdm(image_files):
+            try:
+                image_path = os.path.join(image_folder, filename)
+                image = Image.open(image_path).convert("RGB")
+
+                image_input = preprocess(image)
+                batch_images.append(image_input)
+                batch_names.append(filename)
+                batch_paths.append(image_path)
+
+                if len(batch_images) == BATCH_SIZE:
+                    image_tensor = torch.stack(batch_images).to(device)
+                    batch_embeddings = model.encode_image(image_tensor).cpu().numpy()  # Move to CPU and convert to numpy
+                    embeddings.extend(batch_embeddings)
+                    valid_files.extend(batch_names)
+                    valid_paths.extend(batch_paths)
+                    batch_images, batch_names, batch_paths = [], [], []
+                    
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+                continue
+        
+        if batch_images:
+            image_tensor = torch.stack(batch_images).to(device)
+            batch_embeddings = model.encode_image(image_tensor).cpu().numpy()  # Move to CPU and convert to numpy
+            embeddings.extend(batch_embeddings)
+            valid_files.extend(batch_names)
+            valid_paths.extend(batch_paths)
+
+    # Convert to numpy array
+    embeddings = np.array(embeddings)
+
+    
+
+
+    for i in range(0, len(valid_paths)):
+        embedding_blob= embeddings[i].astype(np.float32).tobytes()
+        cursor.execute("INSERT INTO Embeddings VALUES(?,?,?)", (valid_paths[i], valid_files[i], embedding_blob))
+        
+    conn.commit()
+
+    print("Insertions: ", count)
+
+
+
+
 getEmbeddings("/Users/JeevaanandhIlayaraja/Desktop/Wallpapers")
 res= Search("Red Dead Redemption")
 

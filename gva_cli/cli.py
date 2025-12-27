@@ -2,6 +2,7 @@ import click
 from gva_cli.embeddings import getEmbeddings, Search, getPaths, updateFolder, Search_All
 from pathlib import Path
 import subprocess
+import os
 
 @click.group()
 def cli():
@@ -51,19 +52,20 @@ def search_all(prompt):
 
 
 @cli.command(name="sync")
-@click.argument('path')
-def sync_folder(path):
+def sync_folder():
     base_dir= Path(__file__).resolve().parent
     db_exe= base_dir/ "FileTraversal" / "db_exe"
-    hashPath= base_dir / "FileTraversal" / "hash.py"
+    path= Path.cwd()
+    db= path / "embeddings.db"
 
     subprocess.run(
-        [str(db_exe), path, hashPath],
+        [str(db_exe), str(db), str(path)],
         check=True
     )
 
+    count= updateFolder()
 
-
+    print("Insertions: ",count)
 
 
 @cli.command(name="get-paths")
