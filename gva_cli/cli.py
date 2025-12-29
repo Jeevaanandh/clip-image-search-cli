@@ -31,24 +31,7 @@ def search(prompt):
     else:
         print("Not found. Run embed first")
 
-@cli.command(name="search-all")
-@click.argument('prompt')
-def search_all(prompt):
-    results= Search_All(prompt)
 
-    print("\n")
-
-    if(results):
-        print("Top Results:")
-        print("______________________________________________________________________________")
-        for i in results:
-            print(i)
-
-        print("\n")
-
-
-    else:
-        print("Not found. Run embed first")
 
 
 @cli.command(name="sync")
@@ -84,21 +67,6 @@ def open_image(image):
 
 
 
-
-
-@cli.command(name="get-paths")
-def get_paths():
-    paths=getPaths()
-
-    if(paths):
-        print("\n")
-        for path in paths:
-            print(path)
-
-        print("\n")
-
-    else:
-        print("No folders embedded")
 
 
 

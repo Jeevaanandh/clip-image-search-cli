@@ -148,52 +148,6 @@ def Search(prompt):
 
     return top_results
 
-def Search_All(prompt):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model, preprocess = clip.load("ViT-L/14", device=device)
-
-    file_path = "all_embeddings.pt"
-    if not os.path.exists(file_path):
-        return []
-    
-    all_data = torch.load(file_path, weights_only=False)
-
-    all_embeddings=[]
-    all_files=[]
-
-    
-    
-
-    for path in tqdm(list(all_data.keys()), desc="Loading embeddings"):
-        all_files.extend(all_data[path]["files"])
-        all_embeddings.extend(all_data[path]["embeddings"])
-
-    all_embeddings = np.array(all_embeddings)
-    embeddings= all_embeddings.astype('float32')
-
-    d = embeddings.shape[1]  
-    index = faiss.IndexFlatIP(d)
-    faiss.normalize_L2(embeddings)
-    index.add(embeddings)
-
-    
-    with torch.no_grad():
-        text= clip.tokenize(prompt)
-        text_features = model.encode_text(text)
-
-    # Move text features to CPU and convert to numpy
-    text_vector = text_features.cpu().numpy().astype('float32')
-    faiss.normalize_L2(text_vector)
-
-    k = 10
-    distances, indices = index.search(text_vector, k)
-
-    top_results = []
-    for idx in indices[0]:
-        if idx < len(all_files):  # Safety check
-            top_results.append(all_files[idx])
-
-    return top_results
 
       
 
@@ -287,17 +241,5 @@ def updateFolder():
     return count
 
 
-def getPaths():
-    file_path = "all_embeddings.pt"
-    if not os.path.exists(file_path):
-        return []
-    
-    all_data = torch.load(file_path, weights_only=False)
-
-    paths=[]
-    for path in list(all_data.keys()):
-        paths.append(path)
-
-    return paths
 
     
