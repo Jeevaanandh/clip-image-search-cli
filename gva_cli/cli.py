@@ -68,6 +68,24 @@ def sync_folder():
     print("Insertions: ",count)
 
 
+@cli.command(name="open")
+@click.argument('image')
+def open_image(image):
+    base_dir= Path(__file__).resolve().parent
+    IO= base_dir/ "FileTraversal" / "IO"
+
+    path= Path.cwd()
+    image_path= path / image
+
+    subprocess.run(
+        [str(IO), str(image_path)],
+        check=True
+    )
+
+
+
+
+
 @cli.command(name="get-paths")
 def get_paths():
     paths=getPaths()
