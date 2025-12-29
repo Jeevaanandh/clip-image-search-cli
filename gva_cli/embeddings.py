@@ -156,11 +156,7 @@ def Search(prompt):
 def updateFolder():
     path= os.getcwd()
     
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model, preprocess = clip.load("ViT-L/14", device=device)
-
-    BATCH_SIZE= 16
-
+    
     cur_files=[]
     lst = conn.execute("SELECT name FROM Embeddings;").fetchall()
 
@@ -184,6 +180,12 @@ def updateFolder():
     count= len(image_files)
     if(count==0):
         return 0
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-L/14", device=device)
+
+    BATCH_SIZE= 16
+
     
     
 

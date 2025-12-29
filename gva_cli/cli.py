@@ -1,5 +1,5 @@
 import click
-from gva_cli.embeddings import getEmbeddings, Search, getPaths, updateFolder, Search_All
+from gva_cli.embeddings import getEmbeddings, Search, updateFolder
 from pathlib import Path
 import subprocess
 import os
@@ -48,7 +48,7 @@ def sync_folder():
 
     count= updateFolder()
 
-    print("Insertions: ",count)
+    print("Insertions:",count)
 
 
 @cli.command(name="open")
