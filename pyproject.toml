@@ -15,7 +15,8 @@ dependencies = [
     "tqdm",
     "halo",
     "numpy",
-    "Pillow"
+    "Pillow",
+    "sqlite3"
 ]
 #This enables us to run the command as gva instead of gva_cli.cli:cli
 
