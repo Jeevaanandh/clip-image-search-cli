@@ -66,22 +66,6 @@ def open_image(image):
     )
 
 
-
-
-
-
-
-
-@cli.command()
-@click.argument('image_folder', type=click.Path(exists=True))
-def update(image_folder):
-    status= updateFolder(image_folder)
-
-    if(status== "Success"):
-        print("New images saved")
-
-
-
 @cli.command(name="set")
 @click.argument('image_path', type= click.Path(exists=True))
 def setWallpaper(image_path):
