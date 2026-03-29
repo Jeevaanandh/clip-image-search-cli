@@ -82,5 +82,23 @@ def update(image_folder):
 
 
 
+@cli.command(name="set")
+@click.argument('image_path', type= click.Path(exists=True))
+def setWallpaper(image_path):
+    base_dir= Path(__file__).resolve().parent
+    SET= base_dir/ "FileTraversal" / "CHANGE"
+
+    current_path= Path.cwd()
+    image_path= current_path/image_path
+    
+    subprocess.run(
+        [str(SET), str(image_path)],
+        check=True
+    )
+
+
+
+
+
 if __name__ == '__main__':
     cli()

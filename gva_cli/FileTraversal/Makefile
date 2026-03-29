@@ -5,11 +5,15 @@ OBJS1 = main.o db.o traverse.o  # .o files are generated when we do gcc -c file.
                               # make already has predefined rule %.o: %.c which has a command to convert the .c files to .o
 
 OBJS2 = imageOpen.o
+
+OBJS3 = setWallpaper.o
  
 TARGET1 = db_exe
-TARGET2 = IO
+TARGET2 = IO  #This is for image open
+TARGET3 = CHANGE
 
-all: $(TARGET1) $(TARGET2)
+
+all: $(TARGET1) $(TARGET2) $(TARGET3)
 
 $(TARGET1): $(OBJS1)
 	$(CC) $(OBJS1) $(LIBS) -o $(TARGET1) 
@@ -17,3 +21,7 @@ $(TARGET1): $(OBJS1)
 
 $(TARGET2): $(OBJS2)
 	$(CC) $(OBJS2) -o $(TARGET2) 
+
+
+$(TARGET3): $(OBJS3)
+	$(CC) $(OBJS3) -o $(TARGET3) 

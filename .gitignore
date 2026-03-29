@@ -13,5 +13,8 @@ all_embeddings.pt
 /gva_cli/index.db
 /gva_cli/embeddings.db
 /gva_cli/FileTraversal/io 
+/gva_cli/FileTraversal/imageOpen.o
+/gva_cli/FileTraversal/CHANGE
+/gva_cli/FileTraversal/setWallpaper.o
 
 
